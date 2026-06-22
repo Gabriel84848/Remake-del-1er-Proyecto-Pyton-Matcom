@@ -59,5 +59,54 @@
       "capacidad_total": 3
     }
   ],
-  "reservas": []
+  "reservas": [
+    {
+      "cliente": "Gabriel",
+      "habitaciones": [
+        "H101"
+      ],
+      "servicios": [
+        "desayuno:1",
+        "masaje:1"
+      ],
+      "check_in": "2026-07-14",
+      "check_out": "2026-07-30"
+    },
+    {
+      "cliente": "Gabriel",
+      "habitaciones": [
+        "H204"
+      ],
+      "servicios": [
+        "desayuno:1",
+        "masaje:1"
+      ],
+      "check_in": "2026-07-12",
+      "check_out": "2026-07-19"
+    },
+    {
+      "cliente": "tito",
+      "habitaciones": [
+        "H201"
+      ],
+      "servicios": [
+        "desayuno:1",
+        "masaje:1"
+      ],
+      "check_in": "2026-07-03",
+      "check_out": "2026-07-30"
+    },
+    {
+      "cliente": "Roberto el grande",
+      "habitaciones": [
+        "H102",
+        "H103"
+      ],
+      "servicios": [
+        "desayuno:2"
+      ],
+      "check_in": "2026-07-02",
+      "check_out": "2026-07-15"
+    }
+  ]
 }
