@@ -14,14 +14,6 @@ def limpiar_pantalla():
 def pausa(mensaje="Presiona Enter para continuar..."):
     input(mensaje)
 
-def pedir_si_no_cancelar(pregunta):
-
-    while True:
-        resp = input(pregunta).strip().lower()
-        if resp in ("si", "sí", "no", "cancelar"):
-            return "si" if resp in ("si", "sí") else resp
-        print("Respuesta no válida. Escribe 'si', 'no' o 'cancelar'.")
-
 def ver_habitaciones_interfaz():
     while True:
         limpiar_pantalla()
@@ -249,7 +241,7 @@ def solicitar_servicios(habitaciones_ids, check_in, check_out, servicios, reserv
                 print(f"Desayunos disponibles: {desayunos_disp}")
                 print("(ya tienes 1 desayuno obligatorio para la suite H204)")
                 print()
-                resp = input("¿Añadir desayuno para la otra habitación? (si/no): ").strip().lower()
+                resp = input("¿Añadir desayuno para la otra habitación? (si/no/cancelar): ").strip().lower()
                 if resp in ("si", "sí", "no", "cancelar"):
                     break
                 print("Respuesta no válida. Escribe 'si', 'no' o 'cancelar'.")
@@ -275,7 +267,7 @@ def solicitar_servicios(habitaciones_ids, check_in, check_out, servicios, reserv
                 print("SERVICIO DE DESAYUNO")
                 print("=" * 30)
                 print(f"Desayunos disponibles: {desayunos_disp}\n")
-                resp = input("¿Incluir desayuno? (si/no): ").strip().lower()
+                resp = input("¿Incluir desayuno? (si/no/cancelar): ").strip().lower()
                 if resp in ("si", "sí", "no", "cancelar"):
                     break
                 print("Respuesta no válida. Escribe 'si', 'no' o 'cancelar'.")
@@ -338,7 +330,7 @@ def solicitar_servicios(habitaciones_ids, check_in, check_out, servicios, reserv
             print("SERVICIO DE MASAJE")
             print("=" * 30)
             print(f"Masajes disponibles: {masajes_disp}\n")
-            resp = input("¿Incluir masaje? (si/no): ").strip().lower()
+            resp = input("¿Incluir masaje? (si/no/cancelar): ").strip().lower()
             if resp in ("si", "sí", "no", "cancelar"):
                 break
             print("Respuesta no válida. Escribe 'si', 'no' o 'cancelar'.")
@@ -464,7 +456,7 @@ def crear_reserva_interfaz(habitaciones, servicios, reservas):
     #Resumen y confirmacion
     while True:
         mostrar_resumen(cliente, check_in, check_out, habitaciones_ids, servicios_seleccionados)
-        resp = input("\n¿Confirmar la reserva? (si/no): ").strip().lower()
+        resp = input("\n¿Confirmar la reserva? (si/no/cancelar): ").strip().lower()
         if resp in ("si", "sí", "no", "cancelar"):
             break
         print("Respuesta no válida. Escribe 'si', 'no' o 'cancelar'.")
