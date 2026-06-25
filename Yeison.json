@@ -59,18 +59,5 @@
       "capacidad_total": 3
     }
   ],
-  "reservas": [
-    {
-      "cliente": "Gabriel",
-      "habitaciones": [
-        "H101"
-      ],
-      "servicios": [
-        "desayuno:1",
-        "masaje:1"
-      ],
-      "check_in": "2026-07-14",
-      "check_out": "2026-07-30"
-    }
-  ]
+  "reservas": []
 }

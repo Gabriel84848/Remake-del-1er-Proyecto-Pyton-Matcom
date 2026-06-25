@@ -1,5 +1,4 @@
-from datetime import date
-
+from datetime import date, timedelta
 def validar_check_in(check_in):
    
     hoy = date.today()
@@ -10,6 +9,20 @@ def validar_check_in(check_in):
     if check_in > max_fecha:
         return False, f"No se aceptan reservas con más de 2 años de antelación (máximo {max_fecha.strftime('%d-%m-%Y')})."
     return True, "Check-in válido."
+
+def validar_nombre(nombre):
+    nombre_limpio = nombre.strip()
+    
+    if len(nombre_limpio) < 3:
+        return False, "No aceptamos personas con menos de 3 letras en el nombre."
+
+    for char in nombre_limpio:
+        
+        #isalpha para no tener que permitir 1 a 1 las letras
+        if not (char.isalpha() or char in " -'’"):
+            return False, "Imposible que tengas eso en tu nombre."
+    
+    return True, "Nombre válido."
 
 def validar_check_out(check_in, check_out):
   
@@ -129,3 +142,41 @@ def crear_reserva_sistema(cliente, habitaciones_ids, servicios_solicitados,check
     nueva_reserva = Reserva(cliente, habitaciones_ids, servicios_solicitados, check_in, check_out)
     reservas.append(nueva_reserva)
     return True, "Reserva creada exitosamente.", nueva_reserva
+
+def buscar_hueco_automatico(habitaciones_ids, servicios_solicitados, noches, habitaciones, servicios, reservas):
+    
+    hoy = date.today()
+    limite = hoy.replace(year=hoy.year + 2)
+    
+    #Recorremos dede hoy hasta el lim
+    fecha = hoy
+    while fecha <= limite:
+        check_in = fecha
+        check_out = check_in + timedelta(days=noches)
+        
+        # Verificar disponibilidad de habitaciones
+        disponibles = obtener_habitaciones_disponibles(check_in, check_out, habitaciones, reservas, servicios)
+        ids_disponibles = [h.id for h in disponibles]
+        
+        todas_disponibles = all(id_hab in ids_disponibles for id_hab in habitaciones_ids)
+        if not todas_disponibles:
+            fecha += timedelta(days=1)
+            continue
+        
+        #Verificar disponibilidad de servicios
+        servicios_ok = True
+        for servicio_str in servicios_solicitados:
+            nombre, cant_str = servicio_str.split(":")
+            cantidad = int(cant_str)
+            if cantidad > 0:
+                disponibles_servicio = verificar_disponibilidad_servicio(nombre, check_in, check_out, servicios, reservas)
+                if cantidad > disponibles_servicio:
+                    servicios_ok = False
+                    break
+        
+        if servicios_ok:
+            return check_in, check_out
+        
+        fecha += timedelta(days=1)
+    
+    return None, None

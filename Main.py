@@ -6,7 +6,8 @@ from interfaz_usuario import (
     ver_habitaciones_interfaz,
     ver_servicios_interfaz,
     mostrar_reservas_interfaz,
-    cancelar_reserva_interfaz
+    cancelar_reserva_interfaz,
+    buscar_hueco_interfaz
 )
 
 def menu():
@@ -31,7 +32,7 @@ def main():
     while True:
         opcion = menu()
         if opcion == "1":
-            ver_habitaciones_interfaz()
+            ver_habitaciones_interfaz(reservas)
         elif opcion == "2":
             ver_servicios_interfaz()
         elif opcion == "3":
@@ -41,10 +42,10 @@ def main():
         elif opcion == "5":
             cancelar_reserva_interfaz(reservas, habitaciones, servicios)
         elif opcion == "6":
-            input("Presiona Enter para continuar...")
+            buscar_hueco_interfaz(habitaciones, servicios, reservas)
         elif opcion == "7":
             limpiar_pantalla()
-            print("Saliendo...")
+            print("Saliste...")
             break
         else:
             print("Opción no válida. Inténtalo de nuevo.")
