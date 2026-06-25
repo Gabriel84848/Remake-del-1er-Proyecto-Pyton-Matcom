@@ -20,8 +20,8 @@ def menu():
     print("║   2. Ver catálogo de servicios               ║")
     print("║   3. Ver reservas existentes                 ║")
     print("║   4. Crear nueva reserva                     ║")
-    print("║   5. Cancelar reserva existente              ║")
-    print("║   6. Buscar hueco automático                 ║")
+    print("║   5. Buscar hueco automático                 ║")
+    print("║   6. Cancelar reserva existente              ║")
     print("║   7. Salir                                   ║")
     print("║                                              ║")
     print("╚══════════════════════════════════════════════╝")
@@ -40,9 +40,9 @@ def main():
         elif opcion == "4":
             crear_reserva_interfaz(habitaciones, servicios, reservas)
         elif opcion == "5":
-            cancelar_reserva_interfaz(reservas, habitaciones, servicios)
-        elif opcion == "6":
             buscar_hueco_interfaz(habitaciones, servicios, reservas)
+        elif opcion == "6":
+            cancelar_reserva_interfaz(reservas, habitaciones, servicios)
         elif opcion == "7":
             limpiar_pantalla()
             print("Saliste...")

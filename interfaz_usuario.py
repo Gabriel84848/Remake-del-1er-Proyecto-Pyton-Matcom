@@ -649,6 +649,11 @@ def buscar_hueco_interfaz(habitaciones, servicios, reservas):
             print("Máximo 2 habitaciones.")
             pausa()
             continue
+
+        if len(set(ids)) != len(ids):
+            print("No puedes seleccionar la misma habitación dos veces.")
+            pausa()
+            continue
         
         #existencia y mismo piso
         habitaciones_validas = []
@@ -678,7 +683,7 @@ def buscar_hueco_interfaz(habitaciones, servicios, reservas):
         
         habitaciones_ids = ids
         break
-    
+
     #Servicios
     servicios_seleccionados = []
     total_hab = len(habitaciones_ids)
