@@ -1,5 +1,6 @@
 import os
 from datetime import date
+from guardar_y_cargar import guardar_datos
 from logica_reservas import validar_check_in, validar_check_out
 from logica_reservas import (
     obtener_habitaciones_disponibles,
@@ -485,81 +486,86 @@ def crear_reserva_interfaz(habitaciones, servicios, reservas):
     pausa()
 
 def cancelar_reserva_interfaz(reservas, habitaciones, servicios):
-    """Permite al usuario cancelar una reserva existente."""
-    limpiar_pantalla()
-    print("=" * 60)
-    print("                   CANCELAR RESERVA")
-    print("=" * 60)
-    
-    # Verificar si hay reservas
-    if not reservas:
-        print("\n    No hay reservas para cancelar.")
-        pausa()
-        return
-    
-    # Mostrar lista de reservas
-    for i, reserva in enumerate(reservas, 1):
-        print(f"\n  [{i}] Cliente: {reserva.cliente}")
-        print(f"         {reserva.check_in.strftime('%d-%m-%Y')} → {reserva.check_out.strftime('%d-%m-%Y')}")
-        print(f"         Habitaciones: {', '.join(reserva.habitaciones_ids)}")
-    
-    print("\n" + "=" * 60)
-    
-    # Seleccionar reserva
+
     while True:
-        try:
-            entrada = input("\nIngresa el número de reserva a cancelar (o '0' para salir): ").strip()
-            
-            if entrada == "0" or entrada.lower() == "cancelar":
-                print("\nOperación cancelada.")
-                pausa()
-                return
-            
+        limpiar_pantalla()
+        print("=" * 60)
+        print("                   CANCELAR RESERVA")
+        print("=" * 60)
+        
+        # Verificar si hay reservas
+        if not reservas:
+            print("\n    No hay reservas para cancelar.")
+            pausa()
+            return
+        
+        # Mostrar lista de reservas
+        for i, reserva in enumerate(reservas, 1):
+            print(f"\n  [{i}] Cliente: {reserva.cliente}")
+            print(f"         {reserva.check_in.strftime('%d-%m-%Y')} → {reserva.check_out.strftime('%d-%m-%Y')}")
+            print(f"         Habitaciones: {', '.join(reserva.habitaciones_ids)}")
+        
+        print("\n" + "=" * 60)
+        
+        entrada = input("\nIngresa el número de reserva a cancelar (o '0' para salir): ").strip()
+
+        if entrada == "0" or entrada.lower() == "cancelar":
+                    print("\nOperación cancelada.")
+                    pausa()
+                    return
+
+        # Seleccionar reserva
+        try:    
             numero = int(entrada)
-            
+                
             if numero < 1 or numero > len(reservas):
                 print(f"  Número inválido. Debe ser entre 1 y {len(reservas)}.")
+                pausa()
                 continue
-            
             break
-            
+                
         except ValueError:
             print("  Por favor, ingresa un número válido.")
-    
-    # Mostrar detalles de la reserva seleccionada
+            pausa()
+            continue
+        
+     # Mostrar detalles de la reserva seleccionada
     indice = numero - 1
     reserva_seleccionada = reservas[indice]
-    
+        
     limpiar_pantalla()
     print("=" * 60)
     print("              RESERVA SELECCIONADA")
     print("=" * 60)
     print(f"\n  Cliente: {reserva_seleccionada.cliente}")
-    print(f"  📅 {reserva_seleccionada.check_in.strftime('%d-%m-%Y')} → {reserva_seleccionada.check_out.strftime('%d-%m-%Y')}")
-    print(f"  🏨 Habitaciones: {', '.join(reserva_seleccionada.habitaciones_ids)}")
-    
+    print(f"   {reserva_seleccionada.check_in.strftime('%d-%m-%Y')} → {reserva_seleccionada.check_out.strftime('%d-%m-%Y')}")
+    print(f"   Habitaciones: {', '.join(reserva_seleccionada.habitaciones_ids)}")
+        
     if reserva_seleccionada.servicios_nombres:
         servicios_legibles = []
         for servicio in reserva_seleccionada.servicios_nombres:
             nombre, cantidad = servicio.split(":")
             servicios_legibles.append(f"{nombre.capitalize()} ({cantidad})")
-        print(f"  🍽️ Servicios: {', '.join(servicios_legibles)}")
+        print(f"     Servicios: {', '.join(servicios_legibles)}")
     else:
-        print("  🍽️ Servicios: Ninguno")
-    
+        print("      Servicios: Ninguno")
+        
     print("\n" + "=" * 60)
-    
+        
     # Confirmar cancelacion
-    respuesta = input("\n¿Estás seguro de cancelar esta reserva? (si/no): ").strip().lower()
-    
+    while True:
+        respuesta = input("\n¿Estás seguro de cancelar esta reserva? (si/no): ").strip().lower()
+        if respuesta in ("si", "sí", "no"):
+            break
+    print("Respuesta no válida. Escribe 'si' o 'no'.")
+
     if respuesta == "si" or respuesta == "sí":
         # Eliminar reserva
         reservas.pop(indice)
-        
-        # Guardar cambios
-        from guardar_y_cargar import guardar_datos
+            
+        #   Guardar cambios
         guardar_datos(habitaciones, servicios, reservas)
-        
+            
         limpiar_pantalla()
         print("=" * 60)
         print("                     RESERVA CANCELADA")
@@ -569,5 +575,5 @@ def cancelar_reserva_interfaz(reservas, habitaciones, servicios):
         print("\n" + "=" * 60)
     else:
         print("\nOperación cancelada por el usuario.")
-    
+        
     pausa()
