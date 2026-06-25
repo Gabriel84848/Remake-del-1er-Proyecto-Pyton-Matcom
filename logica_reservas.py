@@ -1,4 +1,6 @@
 from datetime import date, timedelta
+from Clases import Reserva
+
 def validar_check_in(check_in):
    
     hoy = date.today()
@@ -77,6 +79,20 @@ def verificar_disponibilidad_servicio(nombre_servicio, check_in, check_out, serv
     disponibles = servicio_obj.capacidad_total - ocupados
     return disponibles
 
+#Por si acaso aunque en la interfaz no hay forma de que ocura
+def validar_exclusion_mutua(servicios_solicitados):
+    PAREJAS_EXCLUIDAS = [("masaje", "yoga"),]
+    
+    # Extraemoa nombres de los serv
+    nombres_servicios = [s.split(":")[0] for s in servicios_solicitados]
+    
+    # Verificamos si esta
+    for servicio_a, servicio_b in PAREJAS_EXCLUIDAS:
+        if servicio_a in nombres_servicios and servicio_b in nombres_servicios:
+            return False, f"No se pueden reservar '{servicio_a}' y '{servicio_b}' en la misma estancia."
+    
+    return True, ""
+
 def obtener_habitaciones_disponibles(check_in, check_out, habitaciones, reservas, servicios):
     
     disponibles = []
@@ -136,8 +152,10 @@ def validar_restricciones_habitaciones(habitaciones_ids, habitaciones, reservas,
     return True, "Habitaciones válidas.", habitaciones_validas
 
 def crear_reserva_sistema(cliente, habitaciones_ids, servicios_solicitados,check_in, check_out, habitaciones, servicios, reservas):
-   
-    from Clases import Reserva
+
+    valido, mensaje = validar_exclusion_mutua(servicios_solicitados)
+    if not valido:
+        return False, mensaje, None
 
     nueva_reserva = Reserva(cliente, habitaciones_ids, servicios_solicitados, check_in, check_out)
     reservas.append(nueva_reserva)
@@ -145,6 +163,10 @@ def crear_reserva_sistema(cliente, habitaciones_ids, servicios_solicitados,check
 
 def buscar_hueco_automatico(habitaciones_ids, servicios_solicitados, noches, habitaciones, servicios, reservas):
     
+    valido, _ = validar_exclusion_mutua(servicios_solicitados)
+    if not valido:
+        return None, None
+
     hoy = date.today()
     limite = hoy.replace(year=hoy.year + 2)
     

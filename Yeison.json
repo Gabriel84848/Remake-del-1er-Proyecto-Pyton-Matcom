@@ -57,7 +57,24 @@
     {
       "nombre": "masaje",
       "capacidad_total": 3
+    },
+    {
+      "nombre": "yoga",
+      "capacidad_total": 3
     }
   ],
-  "reservas": []
+  "reservas": [
+    {
+      "cliente": "Gabriel",
+      "habitaciones": [
+        "H204"
+      ],
+      "servicios": [
+        "desayuno:1",
+        "masaje:1"
+      ],
+      "check_in": "2026-07-01",
+      "check_out": "2026-07-07"
+    }
+  ]
 }

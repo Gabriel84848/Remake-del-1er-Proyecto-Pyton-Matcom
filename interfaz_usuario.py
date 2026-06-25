@@ -49,7 +49,7 @@ def ver_habitaciones_interfaz(reservas):
         if seleccion not in ids_validos:
             limpiar_pantalla()
             print("=" * 50)
-            print(f"  ❌ La habitación '{seleccion}' no existe.")
+            print(f"     La habitación '{seleccion}' no existe.")
             print("=" * 50)
             pausa()
             continue
@@ -93,9 +93,12 @@ def ver_servicios_interfaz():
     print("║  2. MASAJE                           ║")
     print("║     • Capacidad total: 3 personas    ║")
     print("║                                      ║")
+    print("║  3. YOGA                             ║")
+    print("║     • Capacidad total: 3 personas    ║")
     print("╚══════════════════════════════════════╝")
     print()
     print("Nota: La suite H204 incluye desayuno obligatorio.")
+    print("      No se pueden reservar masaje y yoga en la misma estancia.")
     input("\nPresiona Enter para volver al menú")
 
 def solicitar_cliente():
@@ -189,6 +192,7 @@ def solicitar_habitaciones(habitaciones, reservas, check_in, check_out, servicio
     # Obtener disponibilidad de servicios para mostrar
     desayunos_disp = verificar_disponibilidad_servicio("desayuno", check_in, check_out, servicios, reservas)
     masajes_disp = verificar_disponibilidad_servicio("masaje", check_in, check_out, servicios, reservas)
+    yogas_disp = verificar_disponibilidad_servicio("yoga", check_in, check_out, servicios, reservas)
 
     # Bucle de seleccion
     while True:
@@ -212,8 +216,9 @@ def solicitar_habitaciones(habitaciones, reservas, check_in, check_out, servicio
                 print(f"  • {hab.id} ({hab.tipo}) - {vista_texto}{suite_texto}")
 
         # Mostrar disponibilidad de servicios
-        print(f"\n Desayunos disponibles: {desayunos_disp}")
+        print(f" Desayunos disponibles: {desayunos_disp}")
         print(f" Masajes disponibles: {masajes_disp}")
+        print(f" Yoga disponibles: {yogas_disp}")
 
         print("\n" + "=" * 50)
         print("SELECCIÓN DE HABITACIONES")
@@ -314,7 +319,7 @@ def solicitar_servicios(habitaciones_ids, check_in, check_out, servicios, reserv
                 if resp in ("si", "sí", "no", "cancelar"):
                     break
                 print("Respuesta no válida. Escribe 'si', 'no' o 'cancelar'.")
-                pausa()  # para que el usuario vea el error antes de limpiar
+                pausa() 
             
             if resp == "cancelar":
                 print("\nOperación cancelada por el usuario.")
@@ -360,68 +365,63 @@ def solicitar_servicios(habitaciones_ids, check_in, check_out, servicios, reserv
                     pausa()
     pausa()
 
-    #Masaje
-    limpiar_pantalla()
-    print("SERVICIO DE MASAJE")
-    print("=" * 30)
+    # Calcular disponibilidad de ambos
     masajes_disp = verificar_disponibilidad_servicio("masaje", check_in, check_out, servicios, reservas)
-    print(f"Masajes disponibles: {masajes_disp}\n")
+    yogas_disp = verificar_disponibilidad_servicio("yoga", check_in, check_out, servicios, reservas)
 
-    if total_hab == 1:
-        while True:
-            limpiar_pantalla()
-            print("SERVICIO DE MASAJE")
-            print("=" * 30)
-            print(f"Masajes disponibles: {masajes_disp}\n")
-            resp = input("¿Incluir masaje? (si/no/cancelar): ").strip().lower()
-            if resp in ("si", "sí", "no", "cancelar"):
-                break
-            print("Respuesta no válida. Escribe 'si', 'no' o 'cancelar'.")
-            pausa()
+    while True:
+        limpiar_pantalla()
+        print("SERVICIO EXTRA (MASAJE O YOGA)")
+        print("=" * 30)
+        print(f"Masajes disponibles: {masajes_disp}")
+        print(f"Yoga disponibles:    {yogas_disp}\n")
+        print("Puedes elegir entre masaje o yoga, pero no ambos.")
+        print("También puedes optar por ninguno.\n")
+        opcion = input("¿Qué deseas? (masaje / yoga / ninguno) [m/y/n]: ").strip().lower()
 
-        if resp == "cancelar":
-            print("\nOperación cancelada por el usuario.")
-            return None
-        if resp == "si":
-            if masajes_disp >= 1:
-                servicios_seleccionados.append("masaje:1")
-                print(" Masaje añadido (1 servicio).")
-            else:
-                print("No hay masajes disponibles.")
+        if opcion in ("ninguno", "n"):
+            print("Sin servicio extra.")
+            break
+
+        if opcion in ("masaje", "m"):
+            servicio_elegido = "masaje"
+            disponibilidad = masajes_disp
+        elif opcion in ("yoga", "y"):
+            servicio_elegido = "yoga"
+            disponibilidad = yogas_disp
         else:
-            print("Sin masaje.")
-    else:  # 2 habitaciones
-        while True:
-            limpiar_pantalla()
-            print("SERVICIO DE MASAJE")
-            print("=" * 30)
-            print(f"Masajes disponibles: {masajes_disp}\n")
-            entrada = input("Cantidad de masajes (0, 1 o 2) o 'cancelar': ").strip()
+            print("Opción no válida. Escribe 'm', 'y' o 'n'.")
+            pausa()
+            continue
 
+        if disponibilidad == 0:
+            print(f"Lo siento, no hay {servicio_elegido} disponible en esas fechas.")
+            pausa()
+            continue
+
+        # Preguntar cantidad (máximo: número de habitaciones y disponibilidad)
+        max_cantidad = min(total_hab, disponibilidad)
+        while True:
+            entrada = input(f"Cantidad de {servicio_elegido} (máximo {max_cantidad}) o 'cancelar': ").strip()
             if entrada.lower() == "cancelar":
                 print("\nOperación cancelada por el usuario.")
                 return None
             try:
                 cantidad = int(entrada)
-                if cantidad < 0 or cantidad > 2:
-                    print("Debe ser 0, 1 o 2.")
+                if cantidad < 1 or cantidad > max_cantidad:
+                    print(f"Debe ser entre 1 y {max_cantidad}.")
                     pausa()
                     continue
-                if cantidad > masajes_disp:
-                    print(f"No hay suficientes masajes (solo {masajes_disp} disponibles).")
-                    pausa()
-                    continue
-                if cantidad > 0:
-                    servicios_seleccionados.append(f"masaje:{cantidad}")
-                    print(f" Masaje añadido ({cantidad} servicio(s)).")
-                else:
-                    print("Sin masaje.")
+                # Añadir servicio
+                servicios_seleccionados.append(f"{servicio_elegido}:{cantidad}")
+                print(f" {servicio_elegido.capitalize()} añadido ({cantidad} servicio(s)).")
                 break
             except ValueError:
-                print("Ingresa un número (0, 1 o 2).")
+                print("Ingresa un número válido.")
                 pausa()
-    pausa()
+        break   # Salir del bucle principal
 
+    pausa()
     return servicios_seleccionados
 
 def mostrar_resumen(cliente, check_in, check_out, habitaciones_ids, servicios_seleccionados):
@@ -622,13 +622,7 @@ def cancelar_reserva_interfaz(reservas, habitaciones, servicios):
     pausa()
 
 def buscar_hueco_interfaz(habitaciones, servicios, reservas):
-    
-    limpiar_pantalla()
-    print("=" * 60)
-    print("              BUSCAR HUECO AUTOMÁTICO")
-    print("=" * 60)
-    print("Escribe 'cancelar' en cualquier momento para salir.\n")
-    
+
     # Habitaciones
     while True:
         limpiar_pantalla()
@@ -722,32 +716,50 @@ def buscar_hueco_interfaz(habitaciones, servicios, reservas):
             print("Ingresa un número válido.")
             pausa()
     
-    #Masaje
+    #Masaje o yoga
+    servicio_extra = None
     while True:
         limpiar_pantalla()
         print("=" * 60)
-        print("              MASAJE")
+        print("              SERVICIO EXTRA (MASAJE O YOGA)")
         print("=" * 60)
         print(f"Habitaciones seleccionadas: {', '.join(habitaciones_ids)}")
-        print(f"Puedes pedir hasta {total_hab} masaje(s).\n")
-        
-        entrada = input(f"Cantidad de masajes (0 - {total_hab}) o 'cancelar': ").strip() 
-        if entrada.lower() == "cancelar":
-            print("\nOperación cancelada.")
-            pausa()
-            return
-        try:
-            cantidad = int(entrada)
-            if cantidad < 0 or cantidad > total_hab:
-                print(f"Debe ser entre 0 y {total_hab}.")
-                pausa()
-                continue
-            if cantidad > 0:
-                servicios_seleccionados.append(f"masaje:{cantidad}")
+        print("Elige entre masaje o yoga, o ninguno.\n")
+        opcion = input("¿Qué deseas? (masaje / yoga / ninguno) [m/y/n]: ").strip().lower()
+        if opcion in ("ninguno", "n"):
+            print("Sin servicio extra.")
             break
-        except ValueError:
-            print("Ingresa un número válido.")
+        elif opcion in ("masaje", "m"):
+            servicio_extra = "masaje"
+            break
+        elif opcion in ("yoga", "y"):
+            servicio_extra = "yoga"
+            break
+        else:
+            print("Opción no válida. Escribe 'm', 'y' o 'n'.")
             pausa()
+            continue
+
+    if servicio_extra:
+        max_cantidad = total_hab
+        while True:
+            entrada = input(f"Cantidad de {servicio_extra} (máximo {max_cantidad}) o 'cancelar': ").strip()
+            if entrada.lower() == "cancelar":
+                print("\nOperación cancelada.")
+                pausa()
+                return
+            try:
+                cantidad = int(entrada)
+                if cantidad < 1 or cantidad > max_cantidad:
+                    print(f"Debe ser entre 1 y {max_cantidad}.")
+                    pausa()
+                    continue
+                servicios_seleccionados.append(f"{servicio_extra}:{cantidad}")
+                print(f" {servicio_extra.capitalize()} añadido ({cantidad} servicio(s)).")
+                break
+            except ValueError:
+                print("Ingresa un número válido.")
+                pausa()
     
     # Cantidad de noches
     while True:
