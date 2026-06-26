@@ -1,3 +1,5 @@
+## 1. Qué hace el programa y cómo lo diseñé.
+
 # 1. Qué hace el programa y cómo lo diseñé.
 
 Mi programa es un **sistema de gestión de reservas de un hotel**. En general sirve para planificar y administrar las reservas de las habitaciones y servicios disponibles para cada habitación de forma organizada, evitando conflictos en la disponibilidad de estos servicios y siguiendo una serie de restricciones que cada reserva tiene que respetar.
@@ -37,25 +39,38 @@ En cuanto a los servicios son 3 tipos de servicios y cada uno con su disponibili
 
 ## 1.4 Las Restricciones personalizadas:
 
-### 1.4.1 La suite H204 requiere 1 desayuno disponible para poder ser reservada
+## 1.4.1 Cada reserva puede tener como maximo 2 habitaciones
 
-### 1.4.2 El servicio de masaje y el servicio de yoga no es posible reservarlos simultáneamente.
+Por diseño durante la creacion de reservas el maximo de habitaciones por reserva sera 2. Esto para garantizar que se puedan crear varias reservas y consumir recursos por separado para dinamizar las posibilidades.
+
+## 1.4.2 Las reservas de 2 habitaciones deben ser en el mismo piso
+
+Si haces una reserva con 2 habitaciones, el sistema se encargara de verificar que no esten en el mismo piso 
+
+### 1.4.3 La suite H204 requiere 1 desayuno disponible para poder ser reservada
+
+**Ejemplo práctico**: Si un usuario intenta reservar la suite H204 pero todos los desayunos están ocupados para esas fechas, el sistema no permitirá la reserva y mostrará un mensaje indicando que no hay disponibilidad. Esto se implementa en `obtener_habitaciones_disponibles()` que verifica la disponibilidad de desayunos antes de mostrar la suite como opción.
+
+### 1.4.4 El servicio de masaje y el servicio de yoga no es posible reservarlos simultáneamente.
+
+En la practica el usuario nunca podra seleccionar ambos y la interfaz se encarga de notificarlo con claridad, sin embargo me ecargue de añadir una verificacion tanto en la busqueda manual como en la automatica.
 
 Para el diseño del programa como tal decidí partir del menú inicial del sistema de reservas, al cual fui añadiendo y quitando cosas hasta que al final quedaron las 7 opciones siguientes: 
 
- ("╔══════════════════════════════════════════════╗")
- ("║     BLUE GATE HOTEL - Sistema de Reservas    ║")
- ("╠══════════════════════════════════════════════╣")
- ("║                                              ║")
- ("║   1. Ver catálogo de habitaciones            ║")
- ("║   2. Ver catálogo de servicios               ║")
- ("║   3. Ver reservas existentes                 ║")
- ("║   4. Crear nueva reserva                     ║")
- ("║   5. Buscar hueco automático                 ║")
- ("║   6. Cancelar reserva existente              ║")
- ("║   7. Salir                                   ║")
- ("║                                              ║")
- ("╚══════════════════════════════════════════════╝")
+
+```
+╔══════════════════════════════════════════════╗
+║     BLUE GATE HOTEL - Sistema de Reservas    ║
+╠══════════════════════════════════════════════╣
+║   1. Ver catálogo de habitaciones            ║
+║   2. Ver catálogo de servicios               ║
+║   3. Ver reservas existentes                 ║
+║   4. Crear nueva reserva                     ║
+║   5. Buscar hueco automático                 ║
+║   6. Cancelar reserva existente              ║
+║   7. Salir                                   ║
+╚══════════════════════════════════════════════╝
+```
 
 Cada opción está implementada en el código siguiendo (aproximadamente) el mismo orden. Además se encarga de que no hallan conflicto con los recursos que tenemos, que no se viole la cantidad de los mismos (principalmente de los servicios que tienen cantidad máxima cada uno de ellos para gestionarla como queramos) y por último que se cumplan las restricciones correctamente. 
 
@@ -83,7 +98,7 @@ Esta estructura fue la mejor que se me ocurrió para el proyecto actualmente. Au
 ## 2.1
 El principal problema fue la **falta de organización** que derivó en unos cuantos problemas que tuve que solucionar poco a poco. Me enfoqué demasiado en lo que estaba haciendo en el momento y no miraba lo que tendría que hacer más adelante. Por esta razón cuando volví a abrir el proyecto hace poco tomé la decisión de rehacerlo. Obviamente no empecé desde 0, sino que reutilicé muchas funciones y lógicas así como clases básicas como por ejemplo "guardar_y_cargar" o "Clases".
 
-La magnitud de aquel código espagueti hacía que modificar o añadir algo sea jodido. Llegué a tener varias clases que en realidad no era necesario tenerlas tan fragmentadas. Esto llegó a opacar la clase que manejaba la interfaz. Por esto tomé la decisión de reestructurar mis clases y mantener:
+La magnitud de aquel código espagueti hacía que modificar o añadir algo sea jodido. Llegué a tener varias clases que en realidad no era necesario tenerlas tan fragmentadas. Esto llegó a opacar la clase que manejaba la interfaz. Por esto tomé la decisión de reestructurar mis clases y crear:
 
 - **logica_reservas.py**: todas las funciones de validación y disponibilidad juntas las cuales solo reciben y retornan, con el objetivo de ser usadas por funciones de la interfaz
 
@@ -95,7 +110,7 @@ Ahora en perspectiva es mucho más fácil leer el código y entenderlo. Además 
 Otra cosa que me causó dudas fue el tema de la **persistencia de datos y el uso de json en general** para cargar y guardar datos a la escala de este proyecto. Fue a lo primero que me enfrenté a la hora de crear el programa. Habían detalles de los cuales simplemente no tenía casi práctica como por ejemplo convertir a string objetos date para poder guardarlos en json, etc.
 
 ## 2.3
-El hecho de que la suite tenga requerimientos especificos con respecto a los desayunos me causo mas problemas de los que esperaba. Aunque casi todos eran casos esquinas este fue unos de los casos principales por los que decidi hacerle remake al proyecto. La mejor solucion fue trabajar cuidadosamente caso por caso.
+El hecho de que la suite tenga requerimientos especificos con respecto a los desayunos me causo mas problemas de los que esperaba. Aunque casi todos eran casos esquinas este fue unos de los casos principales por los que decidi hacerle remake al proyecto. La mejor solucion fue trabajar cuidadosamente caso por caso. Osea trabajamos el caso de la suite sola separado del caso donde se reserva la suite y otra habitacion, etc.
 
 ## 2.4
 Otro problema con el cual también me topé ya entrando en las fases finales fue **el manejo de las entradas del usuario en la interfaz**. La causa no fue más que el uso incorrecto de bucles tan sencillos como while true pero que durante la creación del código no tenía contemplado correctamente. Lo que solía suceder es que el usuario introducía algo incorrecto y a pesar de que el programa lo detectaba y notificaba bien, el mensaje quedaba grabado y sobrecargaba la interfaz. 
